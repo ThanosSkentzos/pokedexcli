@@ -5,6 +5,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/ThanosSkentzos/pokedexcli/internal/pokecache"
 )
 
 type MapJSON struct {
@@ -17,26 +19,33 @@ type MapJSON struct {
 	} `json:"results"`
 }
 
-func getMAP(url string) (MapJSON, error) {
+func getMAP(url string, cache *pokecache.Cache) (MapJSON, error) {
 
 	// fmt.Printf("Requesting map data...")
 	mapJSON := MapJSON{}
-	res, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
-		return mapJSON, err
+	data, exists := cache.Get(url)
+	if exists {
+		json.Unmarshal(data, &mapJSON)
+	} else {
+
+		res, err := http.Get(url)
+		if err != nil {
+			log.Fatal(err)
+			return mapJSON, err
+		}
+		body, err := io.ReadAll(res.Body)
+		res.Body.Close()
+		if res.StatusCode > 299 {
+			log.Fatalf("Response failed with status code %d and \nbody: %s\n", res.StatusCode, body)
+			return mapJSON, err
+		}
+		if err != nil {
+			log.Fatal(err)
+			return mapJSON, err
+		}
+		json.Unmarshal(body, &mapJSON)
+		cache.Add(url, body)
 	}
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
-	if res.StatusCode > 299 {
-		log.Fatalf("Response failed with status code %d and \nbody: %s\n", res.StatusCode, body)
-		return mapJSON, err
-	}
-	if err != nil {
-		log.Fatal(err)
-		return mapJSON, err
-	}
-	json.Unmarshal(body, &mapJSON)
 	// fmt.Println("Done.")
 	return mapJSON, nil
 }
