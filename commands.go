@@ -1,22 +1,24 @@
 package main
 
-import (
-	"fmt"
-	"os"
-)
-
-func commandExit() error {
-	fmt.Println("Closing the Pokedex... Goodbye!")
-	os.Exit(0)
-	return nil
+type cliCommand struct {
+	name        string
+	description string
+	callback    func() error
 }
 
-func commandHelp() error {
-	println("Welcome to the Pokedex!")
-	println("Usage")
-	
-	for name, command := range commands {
-		fmt.Printf("%s: %s\n", name, command.description)
-	}
-	return nil
+
+func getCommands() map[string]cliCommand{
+	commands := map[string]cliCommand{
+			"exit": {
+				name:        "exit",
+				description: "Exit the Pokedex",
+				callback:    commandExit,
+			},
+			"help": {
+				name:        "help",
+				description: "Displays a help message",
+				callback:    commandHelp,
+			},
+		}
+	return commands
 }
