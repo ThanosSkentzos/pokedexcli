@@ -33,7 +33,7 @@ func startREPL() {
 		"https://pokeapi.co/api/v2/location-area/",
 		"https://pokeapi.co/api/v2/location-area/",
 		"https://pokeapi.co/api/v2/location-area/",
-		pokecache.NewCache(5),
+		pokecache.NewCache(1000),
 	}
 
 	for {

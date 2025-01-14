@@ -11,6 +11,11 @@ type Cache struct {
 	interval time.Duration
 }
 
+type cacheEntry struct {
+	createdAt time.Time
+	val       []byte
+}
+
 func (c Cache) Add(key string, value []byte) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -31,29 +36,27 @@ func (c Cache) Get(key string) ([]byte, bool) {
 	return entry.val, true
 }
 
-func (c Cache) reapLoop(){
+func (c Cache) reapLoop() {
 	clock := time.NewTicker(c.interval)
 	defer clock.Stop()
-	for range clock.C{
+	for range clock.C {
 		c.mu.Lock()
-		for k,v:= range c.cache{
-			if time.Since(v.createdAt)>=c.interval{
-				delete (c.cache,k)
+		for k, v := range c.cache {
+			if time.Since(v.createdAt) >= c.interval {
+				delete(c.cache, k)
+				// fmt.Printf("\nDeleted %s\n", k)
 			}
 		}
 		c.mu.Unlock()
 	}
 }
 
-type cacheEntry struct {
-	createdAt time.Time
-	val       []byte
-}
-
 func NewCache(interval int) Cache {
-	return Cache{
+	cache := Cache{
 		make(map[string]cacheEntry),
 		&sync.Mutex{},
-		time.Duration(interval) * time.Second,
+		time.Duration(interval) * time.Millisecond,
 	}
+	go cache.reapLoop()
+	return cache
 }
