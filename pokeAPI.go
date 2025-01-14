@@ -2,18 +2,26 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 )
 
-func getMAP() (MapJSON, error) {
+type MapJSON struct {
+	Count    int    `json:"count"`
+	Next     string `json:"next"`
+	Previous any    `json:"previous"`
+	Results  []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"results"`
+}
 
-	fmt.Printf("Requesting map data...")
+func getMAP(url string) (MapJSON, error) {
+
+	// fmt.Printf("Requesting map data...")
 	mapJSON := MapJSON{}
-	URL := "https://pokeapi.co/api/v2/location/"
-	res, err := http.Get(URL)
+	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
 		return mapJSON, err
@@ -29,6 +37,6 @@ func getMAP() (MapJSON, error) {
 		return mapJSON, err
 	}
 	json.Unmarshal(body, &mapJSON)
-	fmt.Println("Done.")
+	// fmt.Println("Done.")
 	return mapJSON, nil
 }

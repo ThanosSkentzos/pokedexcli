@@ -7,6 +7,11 @@ import (
 	"strings"
 )
 
+type Config struct{
+	Previous string
+	Next string
+}
+
 func cleanInput(text string) []string{
 	text = strings.ToLower(text)
 	result := strings.FieldsFunc(text,Separators)
@@ -21,9 +26,18 @@ func Separators(r rune) bool{
 
 func startREPL(){
 	s := bufio.NewScanner(os.Stdin)
-	
+	config := Config{
+		"",
+		"https://pokeapi.co/api/v2/location-area/",
+	}
+
 	for {
 		fmt.Print("Pokedex > ")
+		
+		// commandMap(&config)
+		// commandMap(&config)
+		// commandMap(&config)
+		// commandMap(&config)
 		s.Scan()
 		text := s.Text()
 		userInput := strings.Fields(strings.ToLower(text))
@@ -33,6 +47,6 @@ func startREPL(){
 			fmt.Printf("Unknown command.")
 			continue
 		}
-		command.callback()
+		command.callback(&config)
 	}
 }
