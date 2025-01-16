@@ -10,10 +10,12 @@ import (
 )
 
 type Config struct {
-	Previous string
-	Next     string
-	Base     string
-	cache    pokecache.Cache
+	Previous       string
+	Next           string
+	BaseAreaURL    string
+	BasePokemonURL string
+	cache          pokecache.Cache
+	pokedex        map[string]PokemonJSON
 }
 
 func cleanInput(text string) []string {
@@ -33,11 +35,14 @@ func startREPL() {
 		"https://pokeapi.co/api/v2/location-area/",
 		"https://pokeapi.co/api/v2/location-area/",
 		"https://pokeapi.co/api/v2/location-area/",
+		"https://pokeapi.co/api/v2/pokemon/",
 		pokecache.NewCache(1000 * 1000),
+		make(map[string]PokemonJSON),
 	}
 
 	for {
 		fmt.Print("Pokedex > ")
+		// commandExplore(&config, []string{"asfd"})
 		s.Scan()
 		text := s.Text()
 		userInput := strings.Fields(strings.ToLower(text))
@@ -51,6 +56,6 @@ func startREPL() {
 			fmt.Printf("Unknown command.\n")
 			continue
 		}
-		command.callback(&config,parameters)
+		command.callback(&config, parameters)
 	}
 }

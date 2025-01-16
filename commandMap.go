@@ -13,7 +13,7 @@ func commandMap(config *Config, parameters []string) error {
 	config.Previous = config.Next
 	config.Next = mapJSON.Next
 	if config.Next == "" {
-		config.Next = config.Base
+		config.Next = config.BaseAreaURL
 	}
 	printNames(getAreaNames(mapJSON))
 	return nil
