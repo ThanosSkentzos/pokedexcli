@@ -12,7 +12,7 @@ import (
 type Config struct {
 	Previous string
 	Next     string
-	Initial  string
+	Base     string
 	cache    pokecache.Cache
 }
 
@@ -33,7 +33,7 @@ func startREPL() {
 		"https://pokeapi.co/api/v2/location-area/",
 		"https://pokeapi.co/api/v2/location-area/",
 		"https://pokeapi.co/api/v2/location-area/",
-		pokecache.NewCache(1000),
+		pokecache.NewCache(1000 * 1000),
 	}
 
 	for {
@@ -45,11 +45,12 @@ func startREPL() {
 			continue
 		}
 		name := userInput[0]
+		parameters := userInput[1:]
 		command, ok := getCommands()[name]
 		if !ok {
 			fmt.Printf("Unknown command.\n")
 			continue
 		}
-		command.callback(&config)
+		command.callback(&config,parameters)
 	}
 }
